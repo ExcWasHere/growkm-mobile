@@ -96,7 +96,7 @@ class _PinUnlockScreenState extends State<PinUnlockScreen> {
   void _onUnlockSuccess() {
     if (!mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
-      DashboardScreen.routeName,
+      HomeScreen.routeName,
       (route) => false,
     );
   }

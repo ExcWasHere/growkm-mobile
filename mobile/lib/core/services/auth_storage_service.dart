@@ -15,6 +15,7 @@ class AuthStorageService {
   static const _keyLastLoginAt = 'growkm_last_login_at';
   static const _keySupabaseRefreshToken = 'growkm_supabase_refresh_token';
   static const _keyProfileComplete = 'growkm_profile_complete';
+  static const _keyBiometricEnabled = 'growkm_biometric_enabled';
   static const int _sessionValidDays = 30;
 
   Future<void> saveSession(String refreshToken) async {
@@ -37,6 +38,13 @@ class AuthStorageService {
 
   Future<String?> getRefreshToken() async {
     return _storage.read(key: _keySupabaseRefreshToken);
+  }
+
+  Future<void> extendSession() async {
+    await _storage.write(
+      key: _keyLastLoginAt,
+      value: DateTime.now().toIso8601String(),
+    );
   }
 
   Future<void> clearSession() async {
@@ -75,6 +83,15 @@ class AuthStorageService {
     return sha256.convert(bytes).toString();
   }
 
+  Future<void> setBiometricEnabled(bool value) async {
+    await _storage.write(key: _keyBiometricEnabled, value: value.toString());
+  }
+
+  Future<bool> isBiometricEnabled() async {
+    final value = await _storage.read(key: _keyBiometricEnabled);
+    return value == 'true';
+  }
+
   Future<void> setProfileComplete(bool value) async {
     await _storage.write(key: _keyProfileComplete, value: value.toString());
   }
@@ -88,5 +105,6 @@ class AuthStorageService {
     await clearSession();
     await clearPin();
     await _storage.delete(key: _keyProfileComplete);
+    await _storage.delete(key: _keyBiometricEnabled);
   }
 }
