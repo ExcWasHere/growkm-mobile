@@ -38,7 +38,8 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
         steps: [
           ProductTourStep(
             title: 'Amankan Akunmu',
-            description: 'Buat PIN 6 digit biar cuma kamu yang bisa buka GrowKM di HP ini.',
+            description:
+                'Buat PIN 6 digit biar cuma kamu yang bisa buka GrowKM di HP ini.',
             icon: Icons.lock_outline,
             targetKey: _pinDotsKey,
           ),
@@ -58,7 +59,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
   void _onBackspace() {
     if (_currentInput.isEmpty) return;
-    setState(() => _currentInput = _currentInput.substring(0, _currentInput.length - 1));
+    setState(
+      () =>
+          _currentInput = _currentInput.substring(0, _currentInput.length - 1),
+    );
   }
 
   Future<void> _onComplete() async {
@@ -97,7 +101,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: _isConfirmStep
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -136,7 +143,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                 ),
                 if (_hasError) ...[
                   const SizedBox(height: 12),
-                  const Text('PIN tidak sama, coba lagi', style: TextStyle(color: AppColors.error)),
+                  const Text(
+                    'PIN tidak sama, coba lagi',
+                    style: TextStyle(color: AppColors.error),
+                  ),
                 ],
                 const Spacer(),
                 NumericKeypad(onKeyTap: _onKeyTap, onBackspace: _onBackspace),

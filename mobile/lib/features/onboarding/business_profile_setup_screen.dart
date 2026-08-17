@@ -16,10 +16,12 @@ class BusinessProfileSetupScreen extends StatefulWidget {
   const BusinessProfileSetupScreen({super.key});
 
   @override
-  State<BusinessProfileSetupScreen> createState() => _BusinessProfileSetupScreenState();
+  State<BusinessProfileSetupScreen> createState() =>
+      _BusinessProfileSetupScreenState();
 }
 
-class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen> {
+class _BusinessProfileSetupScreenState
+    extends State<BusinessProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _businessNameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -27,7 +29,11 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
   final _employeeCountController = TextEditingController(text: '1');
   final _monthlyRevenueController = TextEditingController();
   final _formFieldsKey = GlobalKey();
-  static const _businessTypes = ['kuliner', 'fashion_craft', 'jasa_personal_care'];
+  static const _businessTypes = [
+    'kuliner',
+    'fashion_craft',
+    'jasa_personal_care',
+  ];
   static const _businessTypeLabels = {
     'kuliner': 'Kuliner',
     'fashion_craft': 'Fashion & Kerajinan',
@@ -57,7 +63,8 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
         steps: [
           const ProductTourStep(
             title: 'Lengkapi Profil Usaha',
-            description: 'Data ini bantu GrowKM nyusun roadmap legalitas yang pas buat usahamu.',
+            description:
+                'Data ini bantu GrowKM nyusun roadmap legalitas yang pas buat usahamu.',
             icon: Icons.storefront_outlined,
           ),
           ProductTourStep(
@@ -140,24 +147,29 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiClient.instance.post('/api/users/business-profile', {
-        'business_name': _businessNameController.text.trim(),
-        'business_type': _selectedBusinessType,
-        'kbli_code': '',
-        'description': _descriptionController.text.trim(),
-        'province': _selectedProvince!.name,
-        'city': _selectedRegency!.name,
-        'district': _selectedDistrict?.name,
-        'production_location': _productionLocationController.text.trim(),
-        'employee_count': int.tryParse(_employeeCountController.text.trim()) ?? 1,
-        'monthly_revenue_estimate': _monthlyRevenueController.text.trim().isEmpty
-            ? null
-            : int.tryParse(_monthlyRevenueController.text.trim()),
-      });
+      final response = await ApiClient.instance
+          .post('/api/users/business-profile', {
+            'business_name': _businessNameController.text.trim(),
+            'business_type': _selectedBusinessType,
+            'kbli_code': '',
+            'description': _descriptionController.text.trim(),
+            'province': _selectedProvince!.name,
+            'city': _selectedRegency!.name,
+            'district': _selectedDistrict?.name,
+            'production_location': _productionLocationController.text.trim(),
+            'employee_count':
+                int.tryParse(_employeeCountController.text.trim()) ?? 1,
+            'monthly_revenue_estimate':
+                _monthlyRevenueController.text.trim().isEmpty
+                ? null
+                : int.tryParse(_monthlyRevenueController.text.trim()),
+          });
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         if (!mounted) return;
-        _showError('Gagal simpan profil usaha, coba lagi ya (${response.statusCode})');
+        _showError(
+          'Gagal simpan profil usaha, coba lagi ya (${response.statusCode})',
+        );
         return;
       }
 
@@ -174,22 +186,28 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Scaffold(
-      appBar: AppBar(),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: AppBackground(
         child: SafeArea(
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Lengkapi profil usaha', style: theme.textTheme.displaySmall),
+                      Text(
+                        'Lengkapi profil usaha',
+                        style: theme.textTheme.displaySmall,
+                      ),
                       const SizedBox(height: 6),
                       Text(
                         'Data ini bantu kami susun roadmap legalitas yang sesuai',
@@ -218,8 +236,11 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
                             options: _businessTypes,
                             labelBuilder: (v) => _businessTypeLabels[v]!,
                             searchable: false,
-                            onSelected: (v) => setState(() => _selectedBusinessType = v),
-                            validator: (v) => v == null ? 'Kategori usaha wajib dipilih' : null,
+                            onSelected: (v) =>
+                                setState(() => _selectedBusinessType = v),
+                            validator: (v) => v == null
+                                ? 'Kategori usaha wajib dipilih'
+                                : null,
                           ),
                           const SizedBox(height: 16),
                           TextFormField(
@@ -227,12 +248,15 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
                             maxLines: 4,
                             decoration: const InputDecoration(
                               labelText: 'Deskripsi usaha',
-                              hintText: 'Ceritakan usahamu, produk yang dijual, dan target pasarnya',
+                              hintText:
+                                  'Ceritakan usahamu, produk yang dijual, dan target pasarnya',
                               prefixIcon: Icon(Icons.description_outlined),
                             ),
                             validator: (v) {
-                              if (v == null || v.trim().isEmpty) return 'Deskripsi usaha wajib diisi';
-                              if (v.trim().length < 10) return 'Minimal 10 karakter biar AI bisa nganalisa';
+                              if (v == null || v.trim().isEmpty)
+                                return 'Deskripsi usaha wajib diisi';
+                              if (v.trim().length < 10)
+                                return 'Minimal 10 karakter biar AI bisa nganalisa';
                               return null;
                             },
                           ),
@@ -247,7 +271,8 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
                               options: _provinces,
                               labelBuilder: (r) => r.name,
                               onSelected: _onProvinceChanged,
-                              validator: (v) => v == null ? 'Provinsi wajib dipilih' : null,
+                              validator: (v) =>
+                                  v == null ? 'Provinsi wajib dipilih' : null,
                             ),
                             const SizedBox(height: 16),
                             AppSelectField<RegionOption>(
@@ -258,7 +283,8 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
                               labelBuilder: (r) => r.name,
                               enabled: _selectedProvince != null,
                               onSelected: _onRegencyChanged,
-                              validator: (v) => v == null ? 'Kota wajib dipilih' : null,
+                              validator: (v) =>
+                                  v == null ? 'Kota wajib dipilih' : null,
                             ),
                             const SizedBox(height: 16),
                             AppSelectField<RegionOption>(
@@ -268,7 +294,8 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
                               options: _districts,
                               labelBuilder: (r) => r.name,
                               enabled: _selectedRegency != null,
-                              onSelected: (v) => setState(() => _selectedDistrict = v),
+                              onSelected: (v) =>
+                                  setState(() => _selectedDistrict = v),
                             ),
                           ],
                           const SizedBox(height: 16),
@@ -289,7 +316,9 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
                             ),
                             validator: (v) {
                               final n = int.tryParse(v?.trim() ?? '');
-                              return (n == null || n < 1) ? 'Minimal 1 karyawan' : null;
+                              return (n == null || n < 1)
+                                  ? 'Minimal 1 karyawan'
+                                  : null;
                             },
                           ),
                           const SizedBox(height: 16),

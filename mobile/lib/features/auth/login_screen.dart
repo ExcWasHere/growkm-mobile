@@ -105,7 +105,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _routeAfterLogin() async {
-    final hasProfile = await AuthStorageService.instance.hasCompletedProfile();
+    final hasProfile = await SupabaseAuthService.instance.hasBusinessProfile();
+    if (hasProfile) {
+      await AuthStorageService.instance.setProfileComplete(true);
+    }
+
     final hasPin = await AuthStorageService.instance.hasPin();
 
     if (!mounted) return;
@@ -116,15 +120,13 @@ class _LoginScreenState extends State<LoginScreen> {
         (route) => false,
       );
     } else if (!hasPin) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        PinSetupScreen.routeName,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(PinSetupScreen.routeName, (route) => false);
     } else {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        HomeScreen.routeName,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
     }
   }
 
@@ -141,8 +143,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await _routeAfterLogin();
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -160,15 +163,18 @@ class _LoginScreenState extends State<LoginScreen> {
         _googleAuthInProgress = false;
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gagal membuka halaman Google Sign In')),
+            const SnackBar(
+              content: Text('Gagal membuka halaman Google Sign In'),
+            ),
           );
         }
       }
     } on AuthException catch (e) {
       _googleAuthInProgress = false;
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.message)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
       }
     } finally {
       if (mounted && !_googleAuthInProgress) {
@@ -196,8 +202,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         AppColors.brandTextGradient.createShader(bounds),
                     child: Text(
                       'Selamat datang di GrowKM',
-                      style: theme.textTheme.displaySmall
-                          ?.copyWith(color: AppColors.white),
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        color: AppColors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -212,8 +219,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       hintText: 'nama@email.com',
-                      prefixIcon:
-                          Icon(Icons.email_outlined, color: AppColors.primaryDark),
+                      prefixIcon: Icon(
+                        Icons.email_outlined,
+                        color: AppColors.primaryDark,
+                      ),
                     ),
                     validator: _validateEmail,
                   ),
@@ -223,8 +232,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      prefixIcon:
-                          const Icon(Icons.lock_outline, color: AppColors.primaryDark),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: AppColors.primaryDark,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
@@ -232,8 +243,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               : Icons.visibility_off_outlined,
                           color: AppColors.inkMuted,
                         ),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                     validator: _validatePassword,
@@ -256,13 +268,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     children: [
                       Expanded(
-                          child: Divider(color: AppColors.ink.withValues(alpha: 0.15))),
+                        child: Divider(
+                          color: AppColors.ink.withValues(alpha: 0.15),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text('atau', style: theme.textTheme.bodyMedium),
                       ),
                       Expanded(
-                          child: Divider(color: AppColors.ink.withValues(alpha: 0.15))),
+                        child: Divider(
+                          color: AppColors.ink.withValues(alpha: 0.15),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -273,7 +291,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     label: const Text('Masuk dengan Google'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
-                      side: BorderSide(color: AppColors.ink.withValues(alpha: 0.15)),
+                      side: BorderSide(
+                        color: AppColors.ink.withValues(alpha: 0.15),
+                      ),
                       foregroundColor: AppColors.ink,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
