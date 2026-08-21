@@ -27,6 +27,14 @@ class ApiClient {
     );
   }
 
+  Future<http.Response> patch(String path, Map<String, dynamic> body) async {
+    return http.patch(
+      Uri.parse('$_baseUrl$path'),
+      headers: await _headers(),
+      body: jsonEncode(body),
+    );
+  }
+
   Future<http.Response> get(String path) async {
     return http.get(
       Uri.parse('$_baseUrl$path'),

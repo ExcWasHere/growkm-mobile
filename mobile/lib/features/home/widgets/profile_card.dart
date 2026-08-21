@@ -40,11 +40,7 @@ class ProfileCard extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFFBBF24), Color(0xFFF97316)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Color(0xFFF59E0B),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -67,17 +63,17 @@ class ProfileCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFFFFBEB), Color(0xFFFFF7ED)]),
+              color: const Color(0xFFFFFBEB),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFFDE68A)),
             ),
             child: Column(
               children: [
-                const Text('Level Usaha', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFFF97316))),
+                const Text('Level Usaha', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFFD97706))),
                 const SizedBox(height: 2),
                 Text(
                   kLevelConfig[p.level]!.label,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFFEA580C)),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFFB45309)),
                 ),
               ],
             ),

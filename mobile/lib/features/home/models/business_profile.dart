@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
 enum BusinessLevel { starter, berkembang, mapan }
 
 class LevelConfig {
@@ -84,7 +87,6 @@ class BusinessProfile {
   }
 
   String formatBusinessType() {
-    // TODO: samain sama util formatBusinessType() di web kalau formatnya beda
     return businessType
         .split('_')
         .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1)}')
@@ -123,20 +125,19 @@ class GreetingData {
 }
 
 class BadgeData {
-  final String icon;
+  final IconData icon;
   final String name;
   final bool earned;
   const BadgeData({required this.icon, required this.name, required this.earned});
 }
 
 List<BadgeData> getBadges(BusinessProfile p) {
-  // TODO: samain logic-nya sama getBadges() di web (constants.ts) biar konsisten
   return [
-    BadgeData(icon: '📋', name: 'Punya NIB', earned: p.hasNib),
-    BadgeData(icon: '🍱', name: 'Punya PIRT', earned: p.hasPirt),
-    BadgeData(icon: '☪️', name: 'Sertifikat Halal', earned: p.hasHalal),
-    BadgeData(icon: '💊', name: 'Izin Edar BPOM', earned: p.hasBpom),
-    BadgeData(icon: '™️', name: 'Merek Terdaftar', earned: p.hasMerek),
-    BadgeData(icon: '🚀', name: 'Formalisasi 100%', earned: p.formalizationPercent >= 1.0),
+    BadgeData(icon: LucideIcons.fileCheck2, name: 'Punya NIB', earned: p.hasNib),
+    BadgeData(icon: LucideIcons.utensilsCrossed, name: 'Punya PIRT', earned: p.hasPirt),
+    BadgeData(icon: LucideIcons.stamp, name: 'Sertifikat Halal', earned: p.hasHalal),
+    BadgeData(icon: LucideIcons.shieldCheck, name: 'Izin Edar BPOM', earned: p.hasBpom),
+    BadgeData(icon: LucideIcons.copyright, name: 'Merek Terdaftar', earned: p.hasMerek),
+    BadgeData(icon: LucideIcons.trophy, name: 'Formalisasi 100%', earned: p.formalizationPercent >= 1.0),
   ];
 }

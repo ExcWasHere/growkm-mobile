@@ -12,16 +12,15 @@ class FeatureGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final features = [
       _FeatureData(
-        icon: LucideIcons.map,
+        icon: LucideIcons.compass,
         title: 'Guide to Grow',
         subtitle: 'Roadmap legalitas usahamu',
-        colors: const [Color(0xFF60A5FA), Color(0xFF3B82F6)],
         onTap: () {
           // TODO: arahkan ke RoadmapPage begitu udah dibuat
           Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => const ComingSoonPage(
               title: 'Guide to Grow',
-              emoji: '🗺️',
+              emoji: '🧭',
               description: 'Roadmap step-by-step legalitas usahamu segera hadir.',
             ),
           ));
@@ -31,21 +30,18 @@ class FeatureGrid extends StatelessWidget {
         icon: LucideIcons.shieldCheck,
         title: 'KBLI Matcher',
         subtitle: 'Cari kode KBLI usahamu',
-        colors: const [Color(0xFFFBBF24), Color(0xFFF59E0B)],
         onTap: () => onNavigateTab(AppPage.scanner),
       ),
       _FeatureData(
         icon: LucideIcons.wallet,
         title: 'Snap Cash',
         subtitle: 'Catat kas usaha harian',
-        colors: const [Color(0xFF34D399), Color(0xFF059669)],
         onTap: () => onNavigateTab(AppPage.finance),
       ),
       _FeatureData(
         icon: LucideIcons.store,
         title: 'Market Gate',
         subtitle: 'Buka akses pasar produkmu',
-        colors: const [Color(0xFFA855F7), Color(0xFF7C3AED)],
         onTap: () => onNavigateTab(AppPage.market),
       ),
     ];
@@ -102,10 +98,10 @@ class _FeatureCard extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: data.colors, begin: Alignment.topLeft, end: Alignment.bottomRight),
+                color: const Color(0xFFFEF3C7),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(data.icon, color: Colors.white, size: 21),
+              child: Icon(data.icon, color: const Color(0xFFD97706), size: 21),
             ),
             const SizedBox(height: 10),
             Text(data.title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF0F172A))),
@@ -129,14 +125,12 @@ class _FeatureData {
   final IconData icon;
   final String title;
   final String subtitle;
-  final List<Color> colors;
   final VoidCallback onTap;
 
   const _FeatureData({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.colors,
     required this.onTap,
   });
 }

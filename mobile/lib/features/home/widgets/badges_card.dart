@@ -22,7 +22,7 @@ class _BadgesCardState extends State<BadgesCard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFFFFBEB), Color(0xFFFFF7ED)]),
+        color: const Color(0xFFFFFBEB),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
       ),
@@ -32,8 +32,8 @@ class _BadgesCardState extends State<BadgesCard> {
           const SectionHeader(
             icon: LucideIcons.award,
             title: 'Pencapaian',
-            iconColor: Color(0xFF9A3412),
-            iconBg: Color(0xFFFFE3C2),
+            iconColor: Color(0xFFB45309),
+            iconBg: Color(0xFFFEF3C7),
           ),
           const SizedBox(height: 14),
           ...visible.map((b) => Container(
@@ -48,7 +48,19 @@ class _BadgesCardState extends State<BadgesCard> {
                   opacity: b.earned ? 1 : 0.5,
                   child: Row(
                     children: [
-                      Text(b.icon, style: const TextStyle(fontSize: 22)),
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: b.earned ? const Color(0xFFFEF3C7) : const Color(0xFFE2E8F0),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          b.icon,
+                          size: 17,
+                          color: b.earned ? const Color(0xFFD97706) : const Color(0xFF94A3B8),
+                        ),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(b.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
@@ -63,7 +75,7 @@ class _BadgesCardState extends State<BadgesCard> {
               onPressed: () => setState(() => _expanded = !_expanded),
               icon: Icon(_expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown, size: 16),
               label: Text(_expanded ? 'Sembunyikan' : 'Lihat ${badges.length - 3} lainnya'),
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFFF97316)),
+              style: TextButton.styleFrom(foregroundColor: const Color(0xFFD97706)),
             ),
           ),
         ],

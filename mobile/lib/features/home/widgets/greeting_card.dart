@@ -15,14 +15,10 @@ class GreetingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFBBF24), Color(0xFFF97316)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: const Color(0xFFF59E0B),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: const Color(0xFFF97316).withOpacity(0.3), blurRadius: 14, offset: const Offset(0, 6)),
+          BoxShadow(color: const Color(0xFFF59E0B).withOpacity(0.3), blurRadius: 14, offset: const Offset(0, 6)),
         ],
       ),
       child: Row(
@@ -45,8 +41,6 @@ class GreetingCard extends StatelessWidget {
                 if (g.actionLabel != null) ...[
                   const SizedBox(height: 10),
                   GestureDetector(
-                    // TODO: masih diarahkan ke tab Snap Cash secara default,
-                    // belum ada mapping action_url -> AppPage yang generik
                     onTap: () => onNavigateTab(AppPage.finance),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
