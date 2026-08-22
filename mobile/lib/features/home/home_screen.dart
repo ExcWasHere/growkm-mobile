@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/services/supabase_auth_service.dart';
 import '../auth/login_screen.dart';
-import '../../features/home/pages/kbli_page.dart';
+import '../kbli/pages/kbli_page.dart';
 import 'widgets/bottom_navbar.dart';
 import 'widgets/coming_soon.dart';
 import 'pages/beranda_page.dart';
