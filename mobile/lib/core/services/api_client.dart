@@ -41,4 +41,11 @@ class ApiClient {
       headers: await _headers(),
     );
   }
+
+  Future<http.Response> delete(String path) async {
+    return http.delete(
+      Uri.parse('$_baseUrl$path'),
+      headers: await _headers(),
+    );
+  }
 }

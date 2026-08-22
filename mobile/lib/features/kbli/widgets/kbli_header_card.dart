@@ -23,11 +23,7 @@ class KbliHeaderCard extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [KbliColors.orange, Color(0xFFEF4444)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+                color: KbliColors.orange,
               borderRadius: BorderRadius.circular(16),
               boxShadow: const [BoxShadow(color: Color(0x33F97316), blurRadius: 12, offset: Offset(0, 4))],
             ),

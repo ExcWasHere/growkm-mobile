@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/supabase_auth_service.dart';
 import '../auth/login_screen.dart';
 import '../kbli/pages/kbli_page.dart';
+import '../lexa/pages/lexa_chat.dart';
 import 'widgets/bottom_navbar.dart';
 import 'widgets/coming_soon.dart';
 import 'pages/beranda_page.dart';
@@ -39,11 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           BerandaPage(onLogout: _logout, onNavigateTab: _navigateToTab),
           const KbliMatcherPage(),
-          const ComingSoonPage(
-            title: 'Lexa AI',
-            emoji: '🤖',
-            description: 'Tanya-jawab seputar legalitas usaha bareng Lexa AI.',
-          ),
+          const LexaChatPage(),
           const ComingSoonPage(
             title: 'Snap Cash',
             emoji: '💸',
