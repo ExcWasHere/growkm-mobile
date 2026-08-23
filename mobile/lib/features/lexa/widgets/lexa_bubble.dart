@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/lexa_colors.dart';
 import '../models/lexa_models.dart';
+import 'lexa_avatar.dart';
 
 class LexaMessageBubble extends StatelessWidget {
   final ChatMessage message;
+
   const LexaMessageBubble({super.key, required this.message});
+
   bool get _isUser => message.role == ChatRole.user;
 
   @override
@@ -15,7 +17,7 @@ class LexaMessageBubble extends StatelessWidget {
       mainAxisAlignment: _isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (!_isUser) ...[_buildAvatar(), const SizedBox(width: 8)],
+        if (!_isUser) ...[const LexaAvatar(), const SizedBox(width: 8)],
         Flexible(
           child: Container(
             constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
@@ -44,33 +46,8 @@ class LexaMessageBubble extends StatelessWidget {
                   ),
           ),
         ),
-        if (_isUser) ...[const SizedBox(width: 8), _buildAvatar()],
+        if (_isUser) ...[const SizedBox(width: 8), const LexaAvatar(isUser: true)],
       ],
-    );
-  }
-
-  Widget _buildAvatar() {
-    if (_isUser) {
-      return Container(
-        width: 30,
-        height: 30,
-        decoration: const BoxDecoration(color: LexaColors.gray200, shape: BoxShape.circle),
-        child: const Icon(LucideIcons.user, size: 14, color: LexaColors.gray600),
-      );
-    }
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [LexaColors.amber400, LexaColors.orange],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        shape: BoxShape.circle,
-        boxShadow: [BoxShadow(color: LexaColors.amber200.withOpacity(0.6), blurRadius: 6, offset: const Offset(0, 2))],
-      ),
-      child: const Icon(LucideIcons.bot, size: 14, color: Colors.white),
     );
   }
 

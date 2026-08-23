@@ -59,12 +59,13 @@ class LexaSessionDrawer extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: onNewChat,
-                  icon: const Icon(LucideIcons.plus, size: 14),
+                  icon: const Icon(LucideIcons.plus, size: 14, color: LexaColors.orangeDark),
                   label: const Text('Chat Baru'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: LexaColors.orange,
-                    foregroundColor: Colors.white,
+                    backgroundColor: LexaColors.amber50,
+                    foregroundColor: LexaColors.orangeDark,
                     elevation: 0,
+                    side: const BorderSide(color: LexaColors.amber200),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),

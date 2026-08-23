@@ -1,6 +1,7 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/lexa_colors.dart';
+import 'lexa_avatar.dart';
 
 class LexaTypingIndicator extends StatefulWidget {
   const LexaTypingIndicator({super.key});
@@ -15,7 +16,7 @@ class _LexaTypingIndicatorState extends State<LexaTypingIndicator> with SingleTi
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000))..repeat();
   }
 
   @override
@@ -30,20 +31,7 @@ class _LexaTypingIndicatorState extends State<LexaTypingIndicator> with SingleTi
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [LexaColors.amber400, LexaColors.orange],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: LexaColors.amber200.withOpacity(0.6), blurRadius: 6, offset: const Offset(0, 2))],
-          ),
-          child: const Icon(LucideIcons.bot, size: 14, color: Colors.white),
-        ),
+        const LexaAvatar(),
         const SizedBox(width: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -65,11 +53,15 @@ class _LexaTypingIndicatorState extends State<LexaTypingIndicator> with SingleTi
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final t = (_controller.value + index * 0.15) % 1.0;
-        final bounce = (t < 0.4) ? (1 - (t / 0.4 - 1).abs()) : 0.0;
+        final phase = index * 0.25;
+        final wave = math.sin(2 * math.pi * (_controller.value - phase));
+        final bounce = wave > 0 ? wave : 0.0;
         return Transform.translate(
-          offset: Offset(0, -6 * bounce),
-          child: Opacity(opacity: 0.5 + 0.5 * bounce, child: child),
+          offset: Offset(0, -5 * bounce),
+          child: Transform.scale(
+            scale: 0.85 + 0.3 * bounce,
+            child: Opacity(opacity: 0.5 + 0.5 * bounce, child: child),
+          ),
         );
       },
       child: Container(

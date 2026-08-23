@@ -122,6 +122,9 @@ class _LexaChatPageState extends State<LexaChatPage> {
         }
         _messages = [..._messages, ChatMessage(role: ChatRole.assistant, content: result.aiResponse)];
       });
+      if (isFirstMessage && result.sessionId != null) {
+        _repository.saveLocalSessionTitle(result.sessionId!, messageText);
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -141,7 +144,7 @@ class _LexaChatPageState extends State<LexaChatPage> {
       _sessionId = null;
       _messages = [_buildGreetingMessage(_userSnapshot)];
     });
-    Navigator.of(context).maybePop(); // tutup drawer kalau lagi kebuka
+    Navigator.of(context).maybePop();
     WidgetsBinding.instance.addPostFrameCallback((_) => _inputFocusNode.requestFocus());
   }
 
@@ -162,7 +165,7 @@ class _LexaChatPageState extends State<LexaChatPage> {
   }
 
   Future<void> _openHistory() async {
-    _scaffoldKey.currentState?.openEndDrawer();
+    _scaffoldKey.currentState?.openDrawer();
     await _fetchSessions();
   }
 
@@ -203,7 +206,7 @@ class _LexaChatPageState extends State<LexaChatPage> {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: Colors.transparent,
-        endDrawer: LexaSessionDrawer(
+        drawer: LexaSessionDrawer(
           loading: _sessionsLoading,
           sessions: _sessions,
           activeSessionId: _sessionId,
@@ -225,8 +228,8 @@ class _LexaChatPageState extends State<LexaChatPage> {
               child: Column(
                 children: [
                   LexaHeader(onToggleHistory: _openHistory, onNewChat: _startNewChat),
-                  if (_messages.length <= 1) LexaQuickQuestions(onTap: _sendMessage),
                   Expanded(child: _buildMessageList()),
+                  if (_messages.length <= 1) LexaQuickQuestions(onTap: _sendMessage),
                   LexaInputBar(
                     controller: _inputController,
                     focusNode: _inputFocusNode,
