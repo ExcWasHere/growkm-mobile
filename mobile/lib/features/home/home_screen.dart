@@ -3,6 +3,7 @@ import '../../core/services/supabase_auth_service.dart';
 import '../auth/login_screen.dart';
 import '../kbli/pages/kbli_page.dart';
 import '../lexa/pages/lexa_chat.dart';
+import '../market/pages/market_gate_page.dart';
 import 'widgets/bottom_navbar.dart';
 import 'widgets/coming_soon.dart';
 import 'pages/beranda_page.dart';
@@ -46,11 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
             emoji: '💸',
             description: 'Catat & pantau kas usahamu di sini.',
           ),
-          const ComingSoonPage(
-            title: 'Market Gate',
-            emoji: '🛍️',
-            description: 'Buka akses pasar buat produk UMKM kamu.',
-          ),
+          const MarketGatePage(),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(
