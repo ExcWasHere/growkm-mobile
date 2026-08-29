@@ -4,8 +4,8 @@ import '../auth/login_screen.dart';
 import '../kbli/pages/kbli_page.dart';
 import '../lexa/pages/lexa_chat.dart';
 import '../market/pages/market_gate_page.dart';
+import '../snapcash/pages/snapcash_page.dart';
 import 'widgets/bottom_navbar.dart';
-import 'widgets/coming_soon.dart';
 import 'pages/beranda_page.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -42,11 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BerandaPage(onLogout: _logout, onNavigateTab: _navigateToTab),
           const KbliMatcherPage(),
           const LexaChatPage(),
-          const ComingSoonPage(
-            title: 'Snap Cash',
-            emoji: '💸',
-            description: 'Catat & pantau kas usahamu di sini.',
-          ),
+          const SnapCashPage(),
           const MarketGatePage(),
         ],
       ),

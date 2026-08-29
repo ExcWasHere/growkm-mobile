@@ -51,10 +51,12 @@ class MarketAdvisorCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 6,
+                      runSpacing: 4,
                       children: [
                         const Text('Rekomendasi AI Advisor', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: MarketColors.gray800)),
-                        const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
@@ -114,7 +116,7 @@ class MarketAdvisorCard extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Text('⚡', style: TextStyle(fontSize: 12)),
+                  const Text(':-)', style: TextStyle(fontSize: 12)),
                   const SizedBox(width: 6),
                   Text(
                     'Top ${result!.recommendations.length} peluang terbaik khusus untuk usahamu',
