@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../roadmap/pages/roadmap_page.dart';
 import './bottom_navbar.dart';
-import './coming_soon.dart';
 import '../../../core/widgets/section_header.dart';
 
 class FeatureGrid extends StatelessWidget {
@@ -16,13 +16,8 @@ class FeatureGrid extends StatelessWidget {
         title: 'Guide to Grow',
         subtitle: 'Roadmap legalitas usahamu',
         onTap: () {
-          // TODO: arahkan ke RoadmapPage begitu udah dibuat
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => const ComingSoonPage(
-              title: 'Guide to Grow',
-              emoji: '🧭',
-              description: 'Roadmap step-by-step legalitas usahamu segera hadir.',
-            ),
+            builder: (_) => const RoadmapPage(),
           ));
         },
       ),
