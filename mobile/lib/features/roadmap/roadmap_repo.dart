@@ -1,6 +1,7 @@
 import 'dart:convert';
 import '../../core/services/api_client.dart';
 import 'models/roadmap_models.dart';
+
 class RoadmapRepository {
   RoadmapRepository._();
   static final instance = RoadmapRepository._();
@@ -15,8 +16,8 @@ class RoadmapRepository {
     return RoadmapOverview.fromMeJson(data);
   }
 
-  Future<ActionPlan> generateActionPlan(RoadmapStepType stepType) async {
-    final response = await ApiClient.instance.post('/api/users/roadmap/${stepType.wireValue}/action-plan', const {});
+  Future<ActionPlan> generateActionPlan(String stepType) async {
+    final response = await ApiClient.instance.post('/api/users/roadmap/$stepType/action-plan', const {});
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 404) throw RoadmapBusinessProfileMissingException();
     if (response.statusCode == 400) throw RoadmapInvalidStepException();
@@ -27,11 +28,11 @@ class RoadmapRepository {
   }
 
   Future<UpdateStepStatusResult> updateStepStatus({
-    required RoadmapStepType stepType,
+    required String stepType,
     required RoadmapStepStatus status,
   }) async {
     final response = await ApiClient.instance.patch('/api/users/roadmap/status', {
-      'step_type': stepType.wireValue,
+      'step_type': stepType,
       'status': status.wireValue,
     });
     if (response.statusCode == 400) throw RoadmapStepLockedException();

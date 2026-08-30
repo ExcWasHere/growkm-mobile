@@ -1,43 +1,32 @@
-enum RoadmapStepType { nib, sppIrt, halal, bpom, merek, sertifikatStandar }
+const Map<String, String> _knownStepLabels = {
+  'nib': 'NIB',
+  'spp_irt': 'SPP-IRT',
+  'halal': 'Sertifikat Halal',
+  'bpom': 'BPOM',
+  'merek': 'Merek',
+  'sertifikat_standar': 'Sertifikat Standar',
+};
 
-extension RoadmapStepTypeX on RoadmapStepType {
-  String get wireValue => switch (this) {
-        RoadmapStepType.nib => 'nib',
-        RoadmapStepType.sppIrt => 'spp_irt',
-        RoadmapStepType.halal => 'halal',
-        RoadmapStepType.bpom => 'bpom',
-        RoadmapStepType.merek => 'merek',
-        RoadmapStepType.sertifikatStandar => 'sertifikat_standar',
-      };
+const Map<String, String> _knownStepDescriptions = {
+  'nib': 'Nomor Induk Berusaha - identitas legal usahamu',
+  'spp_irt': 'Izin edar pangan olahan rumahan',
+  'halal': 'Sertifikasi kehalalan produk',
+  'bpom': 'Izin edar dari BPOM',
+  'merek': 'Perlindungan nama & logo usaha',
+  'sertifikat_standar': 'Standar kelayakan usaha',
+};
 
-  String get label => switch (this) {
-        RoadmapStepType.nib => 'NIB',
-        RoadmapStepType.sppIrt => 'SPP-IRT',
-        RoadmapStepType.halal => 'Sertifikat Halal',
-        RoadmapStepType.bpom => 'BPOM',
-        RoadmapStepType.merek => 'Merek',
-        RoadmapStepType.sertifikatStandar => 'Sertifikat Standar',
-      };
+String roadmapStepLabel(String wireValue) {
+  if (_knownStepLabels.containsKey(wireValue)) return _knownStepLabels[wireValue]!;
+  return wireValue
+      .split('_')
+      .where((w) => w.isNotEmpty)
+      .map((w) => w[0].toUpperCase() + w.substring(1))
+      .join(' ');
+}
 
-  String get description => switch (this) {
-        RoadmapStepType.nib => 'Nomor Induk Berusaha — identitas legal usahamu',
-        RoadmapStepType.sppIrt => 'Izin edar pangan olahan rumahan',
-        RoadmapStepType.halal => 'Sertifikasi kehalalan produk',
-        RoadmapStepType.bpom => 'Izin edar dari BPOM',
-        RoadmapStepType.merek => 'Perlindungan nama & logo usaha',
-        RoadmapStepType.sertifikatStandar => 'Standar kelayakan usaha',
-      };
-
-  static RoadmapStepType fromWire(String value) {
-    return switch (value) {
-      'spp_irt' => RoadmapStepType.sppIrt,
-      'halal' => RoadmapStepType.halal,
-      'bpom' => RoadmapStepType.bpom,
-      'merek' => RoadmapStepType.merek,
-      'sertifikat_standar' => RoadmapStepType.sertifikatStandar,
-      _ => RoadmapStepType.nib,
-    };
-  }
+String roadmapStepDescription(String wireValue) {
+  return _knownStepDescriptions[wireValue] ?? 'Persyaratan legalitas usaha';
 }
 
 enum RoadmapStepStatus { locked, unlocked, inProgress, completed }
@@ -69,7 +58,7 @@ extension RoadmapStepStatusX on RoadmapStepStatus {
 
 class RoadmapStep {
   final String id;
-  final RoadmapStepType stepType;
+  final String stepType;
   final int stepOrder;
   final bool isRequired;
   final RoadmapStepStatus status;
@@ -90,10 +79,13 @@ class RoadmapStep {
     this.completedAt,
   });
 
+  String get label => roadmapStepLabel(stepType);
+  String get description => roadmapStepDescription(stepType);
+
   factory RoadmapStep.fromJson(Map<String, dynamic> json) {
     return RoadmapStep(
       id: json['id'] as String? ?? '',
-      stepType: RoadmapStepTypeX.fromWire(json['step_type'] as String? ?? 'nib'),
+      stepType: json['step_type'] as String? ?? '',
       stepOrder: json['step_order'] as int? ?? 0,
       isRequired: json['is_required'] as bool? ?? true,
       status: RoadmapStepStatusX.fromWire(json['status'] as String?),
@@ -195,7 +187,7 @@ class ActionPlanPrerequisiteCheck {
 }
 
 class ActionPlan {
-  final RoadmapStepType stepType;
+  final String stepType;
   final String businessName;
   final String city;
   final String estimatedDuration;
@@ -219,7 +211,7 @@ class ActionPlan {
     final weeksJson = json['weeks'] as List<dynamic>? ?? [];
     final notesJson = json['important_notes'] as List<dynamic>? ?? [];
     return ActionPlan(
-      stepType: RoadmapStepTypeX.fromWire(json['step_type'] as String? ?? 'nib'),
+      stepType: json['step_type'] as String? ?? '',
       businessName: json['business_name'] as String? ?? '',
       city: json['city'] as String? ?? '',
       estimatedDuration: json['estimated_duration'] as String? ?? '',

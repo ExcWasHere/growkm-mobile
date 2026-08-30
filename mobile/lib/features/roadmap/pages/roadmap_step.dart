@@ -93,7 +93,7 @@ class _RoadmapStepDetailPageState extends State<RoadmapStepDetailPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text(widget.step.stepType.label, style: const TextStyle(color: RoadmapColors.gray800, fontWeight: FontWeight.w800, fontSize: 16)),
+          title: Text(widget.step.label, style: const TextStyle(color: RoadmapColors.gray800, fontWeight: FontWeight.w800, fontSize: 16)),
           iconTheme: const IconThemeData(color: RoadmapColors.gray800),
         ),
         body: SafeArea(
@@ -136,7 +136,9 @@ class _RoadmapStepDetailPageState extends State<RoadmapStepDetailPage> {
         const SizedBox(height: 16),
         const Text('RENCANA AKSI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: RoadmapColors.gray400, letterSpacing: 0.5)),
         const SizedBox(height: 10),
-        ...plan.weeks.map((w) => RoadmapWeekSection(week: w, initiallyExpanded: w.week == 1)),
+        ...plan.weeks.asMap().entries.map(
+              (entry) => RoadmapWeekSection(week: entry.value, displayIndex: entry.key),
+            ),
         if (plan.importantNotes.isNotEmpty) ...[
           const SizedBox(height: 8),
           _buildImportantNotes(plan.importantNotes),

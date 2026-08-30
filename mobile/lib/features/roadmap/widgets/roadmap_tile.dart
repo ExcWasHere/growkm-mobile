@@ -54,7 +54,7 @@ class RoadmapStepTile extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(step.stepType.label, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: RoadmapColors.gray800)),
+                        Text(step.label, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: RoadmapColors.gray800)),
                         if (!step.isRequired) ...[
                           const SizedBox(width: 6),
                           const Text('(opsional)', style: TextStyle(fontSize: 10, color: RoadmapColors.gray400)),
@@ -62,7 +62,7 @@ class RoadmapStepTile extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 2),
-                    Text(step.stepType.description, style: const TextStyle(fontSize: 11, color: RoadmapColors.gray500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(step.description, style: const TextStyle(fontSize: 11, color: RoadmapColors.gray500), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 6),
                     RoadmapStatusBadge(status: step.status),
                   ],

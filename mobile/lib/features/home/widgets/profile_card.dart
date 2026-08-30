@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../models/business_profile.dart';
-import './coming_soon.dart';
+import '../../profile/pages/profile_page.dart';
 import '../../../core/widgets/section_header.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -27,13 +27,8 @@ class ProfileCard extends StatelessWidget {
           const SizedBox(height: 18),
           GestureDetector(
             onTap: () {
-              // TODO: arahkan ke ProfilePage begitu udah dibuat
               Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => const ComingSoonPage(
-                  title: 'Business Profile',
-                  emoji: '🏪',
-                  description: 'Halaman edit profil usaha segera hadir.',
-                ),
+                builder: (_) => const ProfilePage(),
               ));
             },
             child: Container(
