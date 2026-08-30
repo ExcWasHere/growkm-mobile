@@ -37,6 +37,7 @@ class _SnapCashPageState extends State<SnapCashPage> with SingleTickerProviderSt
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildHeader(),
               const SizedBox(height: 12),
