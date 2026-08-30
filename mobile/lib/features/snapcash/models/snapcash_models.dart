@@ -1,3 +1,12 @@
+import 'dart:typed_data';
+class ReceiptImageUpload {
+  final String fileName;
+  final String contentType;
+  final Uint8List bytes;
+
+  const ReceiptImageUpload({required this.fileName, required this.contentType, required this.bytes});
+}
+
 enum TransactionType { income, expense }
 
 extension TransactionTypeX on TransactionType {
@@ -33,7 +42,6 @@ class Transaction {
   });
 
   String get displayLabel => productName ?? category ?? type.label;
-
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       id: json['id'] as String? ?? '',
@@ -94,7 +102,9 @@ class RecordTransactionResult {
 class GetRecordsResult {
   final List<Transaction> records;
   final int total;
+
   const GetRecordsResult({required this.records, required this.total});
+
   factory GetRecordsResult.fromJson(Map<String, dynamic> json) {
     final list = json['records'] as List<dynamic>? ?? [];
     return GetRecordsResult(

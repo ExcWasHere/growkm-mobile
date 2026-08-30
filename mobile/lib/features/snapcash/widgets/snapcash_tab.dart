@@ -22,7 +22,7 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
   final _imagePicker = ImagePicker();
 
   DateTime _recordDate = DateTime.now();
-  XFile? _attachedImage;
+  final List<XFile> _attachedImages = [];
   bool _submitting = false;
   String? _error;
   RecordTransactionResult? _result;
@@ -33,10 +33,16 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
     super.dispose();
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-    Navigator.of(context).maybePop(); // tutup bottom sheet pilihan
-    final file = await _imagePicker.pickImage(source: source, imageQuality: 80, maxWidth: 1600);
-    if (file != null) setState(() => _attachedImage = file);
+  Future<void> _pickFromCamera() async {
+    Navigator.of(context).maybePop();
+    final file = await _imagePicker.pickImage(source: ImageSource.camera, imageQuality: 80, maxWidth: 1600);
+    if (file != null) setState(() => _attachedImages.add(file));
+  }
+
+  Future<void> _pickFromGallery() async {
+    Navigator.of(context).maybePop();
+    final files = await _imagePicker.pickMultiImage(imageQuality: 80, maxWidth: 1600);
+    if (files.isNotEmpty) setState(() => _attachedImages.addAll(files));
   }
 
   void _showAttachSheet() {
@@ -53,12 +59,13 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
             ListTile(
               leading: const Icon(LucideIcons.camera, color: SnapCashColors.orange),
               title: const Text('Ambil Foto'),
-              onTap: () => _pickImage(ImageSource.camera),
+              onTap: _pickFromCamera,
             ),
             ListTile(
               leading: const Icon(LucideIcons.image, color: SnapCashColors.orange),
               title: const Text('Pilih dari Galeri'),
-              onTap: () => _pickImage(ImageSource.gallery),
+              subtitle: const Text('Bisa pilih beberapa foto sekaligus'),
+              onTap: _pickFromGallery,
             ),
             const SizedBox(height: 8),
           ],
@@ -87,29 +94,30 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
     });
 
     try {
-      String? uploadedUrl;
-      if (_attachedImage != null) {
-        final bytes = await _attachedImage!.readAsBytes();
-        final ext = _attachedImage!.path.split('.').last.toLowerCase();
-        final contentType = (ext == 'png') ? 'image/png' : 'image/jpeg';
-        uploadedUrl = await _repository.uploadReceiptImage(
-          fileName: _attachedImage!.name,
-          contentType: contentType,
-          bytes: bytes,
+      List<String>? uploadedUrls;
+      if (_attachedImages.isNotEmpty) {
+        final uploads = await Future.wait(
+          _attachedImages.map((file) async {
+            final bytes = await file.readAsBytes();
+            final ext = file.path.split('.').last.toLowerCase();
+            final contentType = (ext == 'png') ? 'image/png' : 'image/jpeg';
+            return ReceiptImageUpload(fileName: file.name, contentType: contentType, bytes: bytes);
+          }),
         );
+        uploadedUrls = await _repository.uploadReceiptImages(uploads);
       }
 
       final result = await _repository.recordTransaction(
         message: message,
         recordDate: _recordDate,
-        images: uploadedUrl != null ? [uploadedUrl] : null,
+        images: uploadedUrls,
       );
 
       if (!mounted) return;
       setState(() {
         _result = result;
         _messageController.clear();
-        _attachedImage = null;
+        _attachedImages.clear();
       });
     } catch (e) {
       if (!mounted) return;
@@ -144,6 +152,8 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
                       gradient: const LinearGradient(colors: [SnapCashColors.amber, SnapCashColors.orange]),
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    // Ganti ke Material icon bawaan Flutter — LucideIcons.penLine /
+                    // .pencilLine tidak ada di package lucide_icons versi ini.
                     child: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 20),
                   ),
                   const SizedBox(width: 10),
@@ -203,35 +213,50 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
                         children: [
                           const Icon(LucideIcons.paperclip, size: 13, color: SnapCashColors.gray500),
                           const SizedBox(width: 6),
-                          Text(_attachedImage != null ? 'Foto terpasang' : 'Lampirkan nota', style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: SnapCashColors.gray500)),
+                          Text(
+                            _attachedImages.isNotEmpty ? '${_attachedImages.length} foto terpasang' : 'Lampirkan nota',
+                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: SnapCashColors.gray500),
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-              if (_attachedImage != null) ...[
+              if (_attachedImages.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(File(_attachedImage!.path), height: 120, width: double.infinity, fit: BoxFit.cover),
-                    ),
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () => setState(() => _attachedImage = null),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                          child: const Icon(LucideIcons.x, size: 14, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  height: 84,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _attachedImages.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final file = _attachedImages[index];
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(File(file.path), height: 84, width: 84, fit: BoxFit.cover),
+                          ),
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () => setState(() => _attachedImages.removeAt(index)),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                                child: const Icon(LucideIcons.x, size: 12, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ],
               const SizedBox(height: 14),

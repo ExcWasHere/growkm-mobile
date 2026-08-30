@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../../../core/services/api_client.dart';
+import '../../../core/utils/idempotency.dart';
 import '../models/snapcash_models.dart';
 import 'snapcash_format.dart';
 
@@ -13,11 +14,15 @@ class SnapCashRepository {
     DateTime? recordDate,
     List<String>? images,
   }) async {
-    final response = await ApiClient.instance.post('/api/finance/record', {
-      'message': message,
-      if (recordDate != null) 'record_date': dateToIso(recordDate),
-      if (images != null && images.isNotEmpty) 'images': images,
-    });
+    final response = await ApiClient.instance.post(
+      '/api/finance/record',
+      {
+        'message': message,
+        if (recordDate != null) 'record_date': dateToIso(recordDate),
+        if (images != null && images.isNotEmpty) 'images': images,
+      },
+      headers: {'x-idempotency-key': generateIdempotencyKey()},
+    );
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode != 200) {
       throw Exception(decoded['message'] as String? ?? 'HTTP ${response.statusCode}');
@@ -103,7 +108,6 @@ class SnapCashRepository {
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     return PresignedUploadResult.fromJson(decoded['data'] as Map<String, dynamic>? ?? {});
   }
-
   Future<void> uploadToPresignedUrl({
     required String uploadUrl,
     required Uint8List bytes,
@@ -127,6 +131,18 @@ class SnapCashRepository {
     final presigned = await generatePresignedUrl(fileName: fileName, contentType: contentType);
     await uploadToPresignedUrl(uploadUrl: presigned.uploadUrl, bytes: bytes, contentType: contentType);
     return presigned.publicUrl;
+  }
+
+  Future<List<String>> uploadReceiptImages(List<ReceiptImageUpload> images) {
+    return Future.wait(
+      images.map(
+        (img) => uploadReceiptImage(
+          fileName: img.fileName,
+          contentType: img.contentType,
+          bytes: img.bytes,
+        ),
+      ),
+    );
   }
 
   Future<void> draftIngredientList({DocumentPurpose purpose = DocumentPurpose.sppIrt}) async {

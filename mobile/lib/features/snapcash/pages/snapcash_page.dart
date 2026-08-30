@@ -62,7 +62,7 @@ class _SnapCashPageState extends State<SnapCashPage> with SingleTickerProviderSt
 
   Widget _buildHeader() {
     return const Padding(
-      padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
