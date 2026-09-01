@@ -24,11 +24,7 @@ class LexaAvatar extends StatelessWidget {
       height: size,
       padding: EdgeInsets.all(size * 0.16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [LexaColors.amber400, LexaColors.orange],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+      color: LexaColors.orange,
         shape: BoxShape.circle,
         boxShadow: [BoxShadow(color: LexaColors.amber200.withOpacity(0.6), blurRadius: 6, offset: const Offset(0, 2))],
       ),

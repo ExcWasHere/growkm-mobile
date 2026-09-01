@@ -142,7 +142,7 @@ class _TourOverlayContent extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: const BoxDecoration(
-                          gradient: AppColors.primaryGradient,
+                          color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(step.icon, color: AppColors.white, size: 20),

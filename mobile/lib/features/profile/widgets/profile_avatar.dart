@@ -30,7 +30,7 @@ class ProfileAvatarHeader extends StatelessWidget {
             width: 76,
             height: 76,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(colors: [ProfileColors.amber, ProfileColors.orange]),
+             color: ProfileColors.orange,
               shape: BoxShape.circle,
             ),
             child: Center(

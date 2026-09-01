@@ -27,11 +27,7 @@ class LexaHeader extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [LexaColors.amber400, LexaColors.orange],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+            color: LexaColors.orange,
               borderRadius: BorderRadius.circular(14),
               boxShadow: [BoxShadow(color: LexaColors.amber500.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 3))],
             ),

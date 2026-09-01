@@ -145,7 +145,7 @@ class _RoadmapPageState extends State<RoadmapPage> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [RoadmapColors.amber, RoadmapColors.orange]),
+                  color: RoadmapColors.orange,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(LucideIcons.compass, color: Colors.white, size: 20),

@@ -21,10 +21,6 @@ class AppBottomNavBar extends StatelessWidget {
     _NavTab(page: AppPage.market, label: 'Market Gate', icon: LucideIcons.barChart2),
   ];
 
-  static const _activeGradient = LinearGradient(
-    colors: [Color(0xFFFBBF24), Color(0xFFF97316)],
-  );
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -59,7 +55,7 @@ class AppBottomNavBar extends StatelessWidget {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              gradient: _activeGradient,
+                              color: Colors.deepOrange,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 3),
                               boxShadow: [
@@ -100,7 +96,7 @@ class AppBottomNavBar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      gradient: active ? _activeGradient : null,
+                      color: active ? const Color(0xFFF97316) : Colors.transparent,
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

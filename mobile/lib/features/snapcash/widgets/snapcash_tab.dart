@@ -149,11 +149,9 @@ class _SnapCashRecordTabState extends State<SnapCashRecordTab> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [SnapCashColors.amber, SnapCashColors.orange]),
+                      color: SnapCashColors.orange,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    // Ganti ke Material icon bawaan Flutter — LucideIcons.penLine /
-                    // .pencilLine tidak ada di package lucide_icons versi ini.
                     child: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 20),
                   ),
                   const SizedBox(width: 10),

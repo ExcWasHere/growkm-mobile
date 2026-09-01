@@ -84,7 +84,7 @@ class _SnapCashPageState extends State<SnapCashPage> with SingleTickerProviderSt
         child: TabBar(
           controller: _tabController,
           indicator: BoxDecoration(
-            gradient: const LinearGradient(colors: [SnapCashColors.amber, SnapCashColors.orange]),
+            color: SnapCashColors.orange,
             borderRadius: BorderRadius.circular(10),
           ),
           indicatorSize: TabBarIndicatorSize.tab,

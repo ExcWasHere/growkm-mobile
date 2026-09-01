@@ -41,7 +41,7 @@ class MarketAdvisorCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [MarketColors.amber, MarketColors.orange]),
+                  color: MarketColors.orange,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(LucideIcons.sparkles, color: Colors.white, size: 20),
@@ -60,7 +60,7 @@ class MarketAdvisorCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [MarketColors.amber, MarketColors.orange]),
+                            color: MarketColors.orange,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text('LEXA', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.white)),

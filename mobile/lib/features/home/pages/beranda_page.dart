@@ -177,11 +177,7 @@ class _BerandaPageState extends State<BerandaPage> {
                 width: 46,
                 height: 46,
                 decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFFBBF24), Color(0xFFF97316)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Color(0xFFF97316),
                   shape: BoxShape.circle,
                 ),
                 child: Center(

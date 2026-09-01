@@ -66,14 +66,7 @@ class LexaInputBar extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        LexaColors.amber400.withOpacity(canSend ? 1 : 0.4),
-                        LexaColors.orange.withOpacity(canSend ? 1 : 0.4),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                  color: LexaColors.orange.withOpacity(canSend ? 1 : 0.5),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(LucideIcons.send, size: 18, color: Colors.white),

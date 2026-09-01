@@ -173,7 +173,7 @@ class _MarketOpportunityCardState extends State<MarketOpportunityCard> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(colors: [MarketColors.amber, MarketColors.orange]),
+                                  color: MarketColors.orange,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Row(

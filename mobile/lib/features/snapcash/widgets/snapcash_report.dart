@@ -317,7 +317,7 @@ class _SnapCashReportTabState extends State<SnapCashReportTab> {
               Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(gradient: const LinearGradient(colors: [SnapCashColors.amber, SnapCashColors.orange]), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: SnapCashColors.orange, borderRadius: BorderRadius.circular(12)),
                 child: const Icon(LucideIcons.fileText, color: Colors.white, size: 18),
               ),
               const SizedBox(width: 10),
