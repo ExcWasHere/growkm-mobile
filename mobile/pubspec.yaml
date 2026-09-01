@@ -84,6 +84,7 @@ flutter:
   assets:
     - assets/images/Logo_GrowKM.png
     - assets/images/latar-belakang.svg
+    - assets/images/mascot/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

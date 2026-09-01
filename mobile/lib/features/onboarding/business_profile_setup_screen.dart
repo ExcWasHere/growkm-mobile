@@ -1,47 +1,36 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/services/auth_storage_service.dart';
 import '../../core/services/api_client.dart';
-import '../../core/services/product_tour_service.dart';
-import '../../core/services/product_tour_step.dart';
 import '../../core/services/region_service.dart';
 import '../../core/widgets/app_background.dart';
 import '../../core/widgets/app_select_field.dart';
-import '../../core/widgets/product_tour_dialog.dart';
 import '../auth/pin_setup_screen.dart';
+import 'models/onboard_models.dart';
+import 'theme/onboard_colors.dart';
+import 'widgets/onboard_card.dart';
+import 'widgets/onboard_step.dart';
 
 class BusinessProfileSetupScreen extends StatefulWidget {
   static const routeName = '/business-profile-setup';
   const BusinessProfileSetupScreen({super.key});
 
   @override
-  State<BusinessProfileSetupScreen> createState() =>
-      _BusinessProfileSetupScreenState();
+  State<BusinessProfileSetupScreen> createState() => _BusinessProfileSetupScreenState();
 }
 
-class _BusinessProfileSetupScreenState
-    extends State<BusinessProfileSetupScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen> {
+  static const _totalSteps = 11;
+
   final _businessNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _productionLocationController = TextEditingController();
-  final _employeeCountController = TextEditingController(text: '1');
-  final _monthlyRevenueController = TextEditingController();
-  final _formFieldsKey = GlobalKey();
-  static const _businessTypes = [
-    'kuliner',
-    'fashion_craft',
-    'jasa_personal_care',
-  ];
-  static const _businessTypeLabels = {
-    'kuliner': 'Kuliner',
-    'fashion_craft': 'Fashion & Kerajinan',
-    'jasa_personal_care': 'Jasa & Personal Care',
-  };
 
+  int _currentStep = 0;
   String? _selectedBusinessType;
-  bool _isLoading = false;
+  int? _selectedEmployeeCount;
+  int? _selectedMonthlyRevenue;
+  bool _revenueSkipped = false;
 
   List<RegionOption> _provinces = [];
   List<RegionOption> _regencies = [];
@@ -49,66 +38,16 @@ class _BusinessProfileSetupScreenState
   RegionOption? _selectedProvince;
   RegionOption? _selectedRegency;
   RegionOption? _selectedDistrict;
-  bool _loadingRegions = true;
+  bool _loadingProvinces = true;
+  bool _loadingRegencies = false;
+  bool _loadingDistricts = false;
+
+  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
     _loadProvinces();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ProductTourDialog.showIfNeeded(
-        context,
-        tourKey: 'business_profile_setup_tour',
-        store: ProductTourService.instance,
-        steps: [
-          const ProductTourStep(
-            title: 'Lengkapi Profil Usaha',
-            description:
-                'Data ini bantu GrowKM nyusun roadmap legalitas yang pas buat usahamu.',
-            icon: Icons.storefront_outlined,
-          ),
-          ProductTourStep(
-            title: 'Isi Detail Usaha di Sini',
-            description:
-                'Semakin lengkap dan jelas deskripsi usahamu, semakin akurat rekomendasi KBLI dari AI kami.',
-            icon: Icons.edit_note_outlined,
-            targetKey: _formFieldsKey,
-          ),
-        ],
-      );
-    });
-  }
-
-  Future<void> _loadProvinces() async {
-    final provinces = await RegionService.instance.getProvinces();
-    if (mounted) {
-      setState(() {
-        _provinces = provinces;
-        _loadingRegions = false;
-      });
-    }
-  }
-
-  Future<void> _onProvinceChanged(RegionOption province) async {
-    setState(() {
-      _selectedProvince = province;
-      _selectedRegency = null;
-      _selectedDistrict = null;
-      _regencies = [];
-      _districts = [];
-    });
-    final regencies = await RegionService.instance.getRegencies(province.id);
-    if (mounted) setState(() => _regencies = regencies);
-  }
-
-  Future<void> _onRegencyChanged(RegionOption regency) async {
-    setState(() {
-      _selectedRegency = regency;
-      _selectedDistrict = null;
-      _districts = [];
-    });
-    final districts = await RegionService.instance.getDistricts(regency.id);
-    if (mounted) setState(() => _districts = districts);
   }
 
   @override
@@ -116,9 +55,36 @@ class _BusinessProfileSetupScreenState
     _businessNameController.dispose();
     _descriptionController.dispose();
     _productionLocationController.dispose();
-    _employeeCountController.dispose();
-    _monthlyRevenueController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadProvinces() async {
+    final provinces = await RegionService.instance.getProvinces();
+    if (mounted) setState(() { _provinces = provinces; _loadingProvinces = false; });
+  }
+
+  Future<void> _onProvinceSelected(RegionOption province) async {
+    setState(() {
+      _selectedProvince = province;
+      _selectedRegency = null;
+      _selectedDistrict = null;
+      _regencies = [];
+      _districts = [];
+      _loadingRegencies = true;
+    });
+    final regencies = await RegionService.instance.getRegencies(province.id);
+    if (mounted) setState(() { _regencies = regencies; _loadingRegencies = false; });
+  }
+
+  Future<void> _onRegencySelected(RegionOption regency) async {
+    setState(() {
+      _selectedRegency = regency;
+      _selectedDistrict = null;
+      _districts = [];
+      _loadingDistricts = true;
+    });
+    final districts = await RegionService.instance.getDistricts(regency.id);
+    if (mounted) setState(() { _districts = districts; _loadingDistricts = false; });
   }
 
   void _showError(String message) {
@@ -129,47 +95,82 @@ class _BusinessProfileSetupScreenState
       title: 'Gagal',
       desc: message,
       btnOkOnPress: () {},
-      btnOkColor: AppColors.primaryDark,
+      btnOkColor: OnboardingColors.orangeDark,
     ).show();
   }
 
+  bool get _canContinue {
+    switch (_currentStep) {
+      case 0:
+        return true;
+      case 1:
+        return _businessNameController.text.trim().isNotEmpty;
+      case 2:
+        return _selectedBusinessType != null;
+      case 3:
+        return _descriptionController.text.trim().length >= 10;
+      case 4:
+        return _selectedProvince != null;
+      case 5:
+        return _selectedRegency != null;
+      case 6:
+        return true;
+      case 7:
+        return true;
+      case 8:
+        return _selectedEmployeeCount != null;
+      case 9:
+        return _selectedMonthlyRevenue != null || _revenueSkipped;
+      case 10:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  void _goBack() {
+    if (_currentStep == 0) {
+      Navigator.of(context).maybePop();
+      return;
+    }
+    setState(() => _currentStep--);
+  }
+
+  void _goNext() {
+    if (_currentStep == _totalSteps - 1) {
+      _submit();
+      return;
+    }
+    setState(() => _currentStep++);
+  }
+
+  void _skipStep({int? employeeCount, int? monthlyRevenue}) {
+    setState(() {
+      if (_currentStep == 9) _revenueSkipped = true;
+    });
+    _goNext();
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_selectedBusinessType == null) {
-      _showError('Kategori usaha wajib dipilih');
-      return;
-    }
-    if (_selectedProvince == null || _selectedRegency == null) {
-      _showError('Provinsi dan kota wajib dipilih');
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
+    setState(() => _isSubmitting = true);
     try {
-      final response = await ApiClient.instance
-          .post('/api/users/business-profile', {
-            'business_name': _businessNameController.text.trim(),
-            'business_type': _selectedBusinessType,
-            'kbli_code': '',
-            'description': _descriptionController.text.trim(),
-            'province': _selectedProvince!.name,
-            'city': _selectedRegency!.name,
-            'district': _selectedDistrict?.name,
-            'production_location': _productionLocationController.text.trim(),
-            'employee_count':
-                int.tryParse(_employeeCountController.text.trim()) ?? 1,
-            'monthly_revenue_estimate':
-                _monthlyRevenueController.text.trim().isEmpty
-                ? null
-                : int.tryParse(_monthlyRevenueController.text.trim()),
-          });
+      final response = await ApiClient.instance.post('/api/users/business-profile', {
+        'business_name': _businessNameController.text.trim(),
+        'business_type': _selectedBusinessType,
+        'kbli_code': '',
+        'description': _descriptionController.text.trim(),
+        'province': _selectedProvince!.name,
+        'city': _selectedRegency!.name,
+        'district': _selectedDistrict?.name,
+        'production_location': _productionLocationController.text.trim(),
+        'employee_count': _selectedEmployeeCount ?? 1,
+        'monthly_revenue_estimate': _revenueSkipped ? null : _selectedMonthlyRevenue,
+      });
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         if (!mounted) return;
-        _showError(
-          'Gagal simpan profil usaha, coba lagi ya (${response.statusCode})',
-        );
+        setState(() => _isSubmitting = false);
+        _showError('Gagal simpan profil usaha, coba lagi ya (${response.statusCode})');
         return;
       }
 
@@ -177,183 +178,229 @@ class _BusinessProfileSetupScreenState
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(PinSetupScreen.routeName);
     } catch (_) {
-      if (mounted) _showError('Koneksi bermasalah, coba lagi ya');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      _showError('Koneksi bermasalah, coba lagi ya');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-      body: AppBackground(
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
+      body: AppBackground(child: _buildStep()),
+    );
+  }
+
+  Widget _buildStep() {
+    switch (_currentStep) {
+      case 0:
+        return _stepScaffold(
+          mascot: MascotPose.sapa,
+          question: 'Hai! Aku Lexa yang akan bantu kamu lengkapin profil usaha, cuma butuh beberapa menit kok!',
+          content: const SizedBox.shrink(),
+          continueLabel: 'Yuk!',
+        );
+      case 1:
+        return _stepScaffold(
+          mascot: MascotPose.tanya,
+          question: 'Apa nama usahamu?',
+          content: TextField(
+            controller: _businessNameController,
+            autofocus: true,
+            onChanged: (_) => setState(() {}),
+            decoration: const InputDecoration(hintText: 'Contoh: Dikichi', prefixIcon: Icon(Icons.storefront_outlined)),
+          ),
+        );
+      case 2:
+        return _stepScaffold(
+          mascot: MascotPose.tanya,
+          question: 'Usaha kamu bergerak di bidang apa?',
+          content: Column(
+            children: businessTypeChoices
+                .map((c) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: OnboardingChoiceCard(
+                        label: c.label,
+                        sublabel: c.sublabel,
+                        selected: _selectedBusinessType == c.value,
+                        onTap: () => setState(() => _selectedBusinessType = c.value),
+                      ),
+                    ))
+                .toList(),
+          ),
+        );
+      case 3:
+        return _stepScaffold(
+          mascot: MascotPose.ide,
+          question: 'Ceritain usahamu dong! Produk apa yang dijual dan siapa target pasarnya?',
+          content: TextField(
+            controller: _descriptionController,
+            autofocus: true,
+            maxLines: 5,
+            onChanged: (_) => setState(() {}),
+            decoration: const InputDecoration(
+              hintText: 'Minimal 10 karakter biar Lexa bisa analisa usahamu',
+              alignLabelWithHint: true,
+            ),
+          ),
+        );
+      case 4:
+        return _stepScaffold(
+          mascot: MascotPose.catat,
+          question: 'Usahamu berlokasi di provinsi mana?',
+          content: _loadingProvinces
+              ? const Center(child: CircularProgressIndicator())
+              : AppSelectField<RegionOption>(
+                  label: 'Provinsi',
+                  icon: Icons.map_outlined,
+                  value: _selectedProvince,
+                  options: _provinces,
+                  labelBuilder: (r) => r.name,
+                  onSelected: _onProvinceSelected,
                 ),
-                child: Form(
-                  key: _formKey,
+        );
+      case 5:
+        return _stepScaffold(
+          mascot: MascotPose.catat,
+          question: 'Kalau kota atau kabupatennya?',
+          content: _loadingRegencies
+              ? const Center(child: CircularProgressIndicator())
+              : AppSelectField<RegionOption>(
+                  label: 'Kota / Kabupaten',
+                  icon: Icons.location_city_outlined,
+                  value: _selectedRegency,
+                  options: _regencies,
+                  labelBuilder: (r) => r.name,
+                  onSelected: _onRegencySelected,
+                ),
+        );
+      case 6:
+        return _stepScaffold(
+          mascot: MascotPose.catat,
+          question: 'Kecamatannya apa? Boleh diisi nanti di menu profile kok',
+          content: _loadingDistricts
+              ? const Center(child: CircularProgressIndicator())
+              : AppSelectField<RegionOption>(
+                  label: 'Kecamatan (opsional)',
+                  icon: Icons.pin_drop_outlined,
+                  value: _selectedDistrict,
+                  options: _districts,
+                  labelBuilder: (r) => r.name,
+                  onSelected: (v) => setState(() => _selectedDistrict = v),
+                ),
+          onSkip: () => _goNext(),
+        );
+      case 7:
+        return _stepScaffold(
+          mascot: MascotPose.tanya,
+          question: 'Di mana biasanya kamu produksi atau operasional?',
+          content: TextField(
+            controller: _productionLocationController,
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'Contoh: Rumah / Ruko', prefixIcon: Icon(Icons.factory_outlined)),
+          ),
+          onSkip: () => _goNext(),
+        );
+      case 8:
+        return _stepScaffold(
+          mascot: MascotPose.tanya,
+          question: 'Berapa karyawan yang kamu punya?',
+          content: Column(
+            children: employeeCountChoices
+                .map((c) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: OnboardingChoiceCard(
+                        label: c.label,
+                        selected: _selectedEmployeeCount == c.value,
+                        onTap: () => setState(() => _selectedEmployeeCount = c.value),
+                      ),
+                    ))
+                .toList(),
+          ),
+        );
+      case 9:
+        return _stepScaffold(
+          mascot: MascotPose.ide,
+          question: 'Kira-kira berapa omzet usahamu per bulan?',
+          content: Column(
+            children: monthlyRevenueChoices
+                .map((c) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: OnboardingChoiceCard(
+                        label: c.label,
+                        selected: !_revenueSkipped && _selectedMonthlyRevenue == c.value,
+                        onTap: () => setState(() {
+                          _selectedMonthlyRevenue = c.value;
+                          _revenueSkipped = false;
+                        }),
+                      ),
+                    ))
+                .toList(),
+          ),
+          onSkip: () => _skipStep(),
+        );
+      case 10:
+        return _stepScaffold(
+          mascot: MascotPose.sapa,
+          question: 'Mantap! Semua udah keisi, yuk simpan profil usahamu.',
+          content: _buildRecap(),
+          continueLabel: 'Selesai',
+        );
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Widget _stepScaffold({
+    required MascotPose mascot,
+    required String question,
+    required Widget content,
+    String continueLabel = 'Lanjutkan',
+    VoidCallback? onSkip,
+  }) {
+    return OnboardingStepScaffold(
+      currentStep: _currentStep,
+      totalSteps: _totalSteps,
+      mascot: mascot,
+      question: question,
+      content: content,
+      canContinue: _canContinue,
+      submitting: _isSubmitting,
+      continueLabel: continueLabel,
+      onBack: _goBack,
+      onContinue: _goNext,
+      onSkip: onSkip,
+    );
+  }
+
+  Widget _buildRecap() {
+    final rows = <(String, String)>[
+      ('Nama usaha', _businessNameController.text.trim()),
+      ('Kategori', businessTypeChoices.firstWhere((c) => c.value == _selectedBusinessType, orElse: () => businessTypeChoices.first).label),
+      ('Lokasi', '${_selectedRegency?.name ?? '-'}, ${_selectedProvince?.name ?? '-'}'),
+      ('Karyawan', employeeCountChoices.firstWhere((c) => c.value == _selectedEmployeeCount, orElse: () => employeeCountChoices.first).label),
+    ];
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: OnboardingColors.amber200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: rows
+            .map((r) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Lengkapi profil usaha',
-                        style: theme.textTheme.displaySmall,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Data ini bantu kami susun roadmap legalitas yang sesuai',
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 28),
-                      Column(
-                        key: _formFieldsKey,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            controller: _businessNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nama usaha',
-                              prefixIcon: Icon(Icons.storefront_outlined),
-                            ),
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Nama usaha wajib diisi'
-                                : null,
-                          ),
-                          const SizedBox(height: 16),
-                          AppSelectField<String>(
-                            label: 'Kategori usaha',
-                            icon: Icons.category_outlined,
-                            value: _selectedBusinessType,
-                            options: _businessTypes,
-                            labelBuilder: (v) => _businessTypeLabels[v]!,
-                            searchable: false,
-                            onSelected: (v) =>
-                                setState(() => _selectedBusinessType = v),
-                            validator: (v) => v == null
-                                ? 'Kategori usaha wajib dipilih'
-                                : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _descriptionController,
-                            maxLines: 4,
-                            decoration: const InputDecoration(
-                              labelText: 'Deskripsi usaha',
-                              hintText:
-                                  'Ceritakan usahamu, produk yang dijual, dan target pasarnya',
-                              prefixIcon: Icon(Icons.description_outlined),
-                            ),
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty)
-                                return 'Deskripsi usaha wajib diisi';
-                              if (v.trim().length < 10)
-                                return 'Minimal 10 karakter biar AI bisa nganalisa';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          if (_loadingRegions)
-                            const Center(child: CircularProgressIndicator())
-                          else ...[
-                            AppSelectField<RegionOption>(
-                              label: 'Provinsi',
-                              icon: Icons.map_outlined,
-                              value: _selectedProvince,
-                              options: _provinces,
-                              labelBuilder: (r) => r.name,
-                              onSelected: _onProvinceChanged,
-                              validator: (v) =>
-                                  v == null ? 'Provinsi wajib dipilih' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            AppSelectField<RegionOption>(
-                              label: 'Kota / Kabupaten',
-                              icon: Icons.location_city_outlined,
-                              value: _selectedRegency,
-                              options: _regencies,
-                              labelBuilder: (r) => r.name,
-                              enabled: _selectedProvince != null,
-                              onSelected: _onRegencyChanged,
-                              validator: (v) =>
-                                  v == null ? 'Kota wajib dipilih' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            AppSelectField<RegionOption>(
-                              label: 'Kecamatan (opsional)',
-                              icon: Icons.pin_drop_outlined,
-                              value: _selectedDistrict,
-                              options: _districts,
-                              labelBuilder: (r) => r.name,
-                              enabled: _selectedRegency != null,
-                              onSelected: (v) =>
-                                  setState(() => _selectedDistrict = v),
-                            ),
-                          ],
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _productionLocationController,
-                            decoration: const InputDecoration(
-                              labelText: 'Lokasi produksi (opsional)',
-                              prefixIcon: Icon(Icons.factory_outlined),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _employeeCountController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Jumlah karyawan',
-                              prefixIcon: Icon(Icons.groups_outlined),
-                            ),
-                            validator: (v) {
-                              final n = int.tryParse(v?.trim() ?? '');
-                              return (n == null || n < 1)
-                                  ? 'Minimal 1 karyawan'
-                                  : null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _monthlyRevenueController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Estimasi omzet bulanan (opsional)',
-                              prefixIcon: Icon(Icons.payments_outlined),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-                      ElevatedButton(
-                        onPressed: _isLoading ? null : _submit,
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.4,
-                                  color: AppColors.white,
-                                ),
-                              )
-                            : const Text('Lanjut'),
-                      ),
-                      const SizedBox(height: 24),
+                      Text(r.$1, style: const TextStyle(fontSize: 11, color: OnboardingColors.gray500)),
+                      Text(r.$2, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: OnboardingColors.gray800)),
                     ],
                   ),
-                ),
-              ),
-            ),
-          ),
-        ),
+                ))
+            .toList(),
       ),
     );
   }
