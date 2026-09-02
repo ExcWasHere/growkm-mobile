@@ -199,6 +199,7 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
           question: 'Hai! Aku Lexa yang akan bantu kamu lengkapin profil usaha, cuma butuh beberapa menit kok!',
           content: const SizedBox.shrink(),
           continueLabel: 'Yuk!',
+          centerMascot: true,
         );
       case 1:
         return _stepScaffold(
@@ -357,6 +358,7 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
     required Widget content,
     String continueLabel = 'Lanjutkan',
     VoidCallback? onSkip,
+    bool centerMascot = false,
   }) {
     return OnboardingStepScaffold(
       currentStep: _currentStep,
@@ -370,6 +372,7 @@ class _BusinessProfileSetupScreenState extends State<BusinessProfileSetupScreen>
       onBack: _goBack,
       onContinue: _goNext,
       onSkip: onSkip,
+      centerMascot: centerMascot,
     );
   }
 

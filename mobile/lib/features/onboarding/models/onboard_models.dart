@@ -2,10 +2,10 @@ enum MascotPose { sapa, tanya, ide, catat }
 
 extension MascotPoseX on MascotPose {
   String get assetPath => switch (this) {
-        MascotPose.sapa => 'assets/images/mascot/sapa.png',
+        MascotPose.sapa => 'assets/images/mascot/sapa_trans.png',
         MascotPose.tanya => 'assets/images/mascot/tanya.png',
-        MascotPose.ide => 'assets/images/mascot/ide.png',
-        MascotPose.catat => 'assets/images/mascot/catat.png',
+        MascotPose.ide => 'assets/images/mascot/ide_trans.png',
+        MascotPose.catat => 'assets/images/mascot/catat_trans.png',
       };
 }
 
