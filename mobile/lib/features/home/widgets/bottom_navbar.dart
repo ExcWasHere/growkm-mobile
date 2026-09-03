@@ -6,11 +6,13 @@ enum AppPage { beranda, scanner, chatbot, finance, market }
 class AppBottomNavBar extends StatelessWidget {
   final AppPage currentPage;
   final ValueChanged<AppPage> onNavigate;
+  final Map<AppPage, GlobalKey>? tabKeys;
 
   const AppBottomNavBar({
     super.key,
     required this.currentPage,
     required this.onNavigate,
+    this.tabKeys,
   });
 
   static const _tabs = [
@@ -40,78 +42,85 @@ class AppBottomNavBar extends StatelessWidget {
             children: _tabs.map((tab) {
               final active = currentPage == tab.page;
               final isChatbot = tab.page == AppPage.chatbot;
+              final key = tabKeys?[tab.page];
 
               if (isChatbot) {
                 return Expanded(
-                  child: GestureDetector(
-                    onTap: () => onNavigate(tab.page),
-                    behavior: HitTestBehavior.opaque,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Transform.translate(
-                          offset: const Offset(0, -14),
-                          child: Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: Colors.deepOrange,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFF97316).withOpacity(active ? 0.5 : 0.35),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Icon(tab.icon, color: Colors.white, size: 24),
-                          ),
-                        ),
-                        Transform.translate(
-                          offset: const Offset(0, -8),
-                          child: Text(
-                            tab.label,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              color: active ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                  child: KeyedSubtree(
+                    key: key,
+                    child: GestureDetector(
+                      onTap: () => onNavigate(tab.page),
+                      behavior: HitTestBehavior.opaque,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Transform.translate(
+                            offset: const Offset(0, -14),
+                            child: Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59E0B),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFF59E0B).withOpacity(active ? 0.5 : 0.35),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(tab.icon, color: Colors.white, size: 24),
                             ),
                           ),
-                        ),
-                      ],
+                          Transform.translate(
+                            offset: const Offset(0, -8),
+                            child: Text(
+                              tab.label,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: active ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
               }
 
               return Expanded(
-                child: GestureDetector(
-                  onTap: () => onNavigate(tab.page),
-                  behavior: HitTestBehavior.opaque,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeInOut,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: active ? const Color(0xFFF97316) : Colors.transparent,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(tab.icon, size: 20, color: active ? Colors.white : const Color(0xFF64748B)),
-                        const SizedBox(height: 3),
-                        Text(
-                          tab.label,
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            color: active ? Colors.white : const Color(0xFF64748B),
+                child: KeyedSubtree(
+                  key: key,
+                  child: GestureDetector(
+                    onTap: () => onNavigate(tab.page),
+                    behavior: HitTestBehavior.opaque,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: active ? const Color(0xFFF59E0B) : Colors.transparent,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(tab.icon, size: 20, color: active ? Colors.white : const Color(0xFF64748B)),
+                          const SizedBox(height: 3),
+                          Text(
+                            tab.label,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: active ? Colors.white : const Color(0xFF64748B),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

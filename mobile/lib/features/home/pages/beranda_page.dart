@@ -16,11 +16,15 @@ enum _LoadState { loading, loaded, error }
 class BerandaPage extends StatefulWidget {
   final VoidCallback onLogout;
   final ValueChanged<AppPage> onNavigateTab;
+  final GlobalKey? profileCardKey;
+  final GlobalKey? roadmapCardKey;
 
   const BerandaPage({
     super.key,
     required this.onLogout,
     required this.onNavigateTab,
+    this.profileCardKey,
+    this.roadmapCardKey,
   });
 
   @override
@@ -147,9 +151,12 @@ class _BerandaPageState extends State<BerandaPage> {
               ],
               LevelBanner(businessProfile: p),
               const SizedBox(height: 16),
-              ProfileCard(businessProfile: p),
+              KeyedSubtree(
+                key: widget.profileCardKey,
+                child: ProfileCard(businessProfile: p),
+              ),
               const SizedBox(height: 16),
-              FeatureGrid(onNavigateTab: widget.onNavigateTab),
+              FeatureGrid(onNavigateTab: widget.onNavigateTab, roadmapCardKey: widget.roadmapCardKey),
               const SizedBox(height: 16),
               FormalizationSlider(businessProfile: p),
               const SizedBox(height: 16),

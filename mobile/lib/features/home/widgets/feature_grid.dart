@@ -6,7 +6,9 @@ import '../../../core/widgets/section_header.dart';
 
 class FeatureGrid extends StatelessWidget {
   final ValueChanged<AppPage> onNavigateTab;
-  const FeatureGrid({super.key, required this.onNavigateTab});
+  final GlobalKey? roadmapCardKey;
+
+  const FeatureGrid({super.key, required this.onNavigateTab, this.roadmapCardKey});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,13 @@ class FeatureGrid extends StatelessWidget {
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 0.98,
-            children: features.map((f) => _FeatureCard(data: f)).toList(),
+            children: List.generate(features.length, (index) {
+              final card = _FeatureCard(data: features[index]);
+              if (index == 0 && roadmapCardKey != null) {
+                return KeyedSubtree(key: roadmapCardKey, child: card);
+              }
+              return card;
+            }),
           ),
         ],
       ),

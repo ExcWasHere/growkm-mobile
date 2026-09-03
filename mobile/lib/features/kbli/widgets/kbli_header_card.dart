@@ -15,7 +15,7 @@ class KbliHeaderCard extends StatelessWidget {
         children: [
           const Text(
             'KBLI Matcher',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: KbliColors.orange),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: KbliColors.amber500),
           ),
           const SizedBox(height: 2),
           Text(

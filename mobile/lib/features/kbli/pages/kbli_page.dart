@@ -91,11 +91,11 @@ class _KbliMatcherPageState extends State<KbliMatcherPage> {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: RefreshIndicator(
-            color: KbliColors.orange,
+            color: KbliColors.amber500,
             onRefresh: _fetchBusinessSnapshot,
             child: switch (_profileLoadState) {
               _ProfileLoadState.loading => const Center(
-                  child: CircularProgressIndicator(color: KbliColors.orange),
+                  child: CircularProgressIndicator(color: KbliColors.amber500),
                 ),
               _ProfileLoadState.error => _buildProfileErrorState(),
               _ProfileLoadState.loaded => _buildContent(),
@@ -127,7 +127,7 @@ class _KbliMatcherPageState extends State<KbliMatcherPage> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _fetchBusinessSnapshot,
-                    style: ElevatedButton.styleFrom(backgroundColor: KbliColors.orange),
+                    style: ElevatedButton.styleFrom(backgroundColor: KbliColors.amber500),
                     child: const Text('Coba Lagi', style: TextStyle(color: Colors.white)),
                   ),
                 ],
