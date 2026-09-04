@@ -1,0 +1,161 @@
+import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/services/auth_storage_service.dart';
+import '../../core/services/product_tour_service.dart';
+import '../../core/services/product_tour_step.dart';
+import '../../core/widgets/app_background.dart';
+import '../../core/widgets/numeric_keypad.dart';
+import '../../core/widgets/pin_dots.dart';
+import '../../core/widgets/product_tour_dialog.dart';
+import 'biometric_setup_screen.dart';
+
+const _pinLength = 6;
+
+class PinSetupScreen extends StatefulWidget {
+  static const routeName = '/pin-setup';
+
+  const PinSetupScreen({super.key});
+
+  @override
+  State<PinSetupScreen> createState() => _PinSetupScreenState();
+}
+
+class _PinSetupScreenState extends State<PinSetupScreen> {
+  String _firstPin = '';
+  String _currentInput = '';
+  bool _isConfirmStep = false;
+  bool _hasError = false;
+  final _pinDotsKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ProductTourDialog.showIfNeeded(
+        context,
+        tourKey: 'pin_setup_tour',
+        store: ProductTourService.instance,
+        steps: [
+          ProductTourStep(
+            title: 'Amankan Akunmu',
+            description:
+                'Buat PIN 6 digit biar cuma kamu yang bisa buka GrowKM di HP ini.',
+            icon: Icons.lock_outline,
+            targetKey: _pinDotsKey,
+          ),
+        ],
+      );
+    });
+  }
+
+  void _onKeyTap(String digit) {
+    if (_currentInput.length >= _pinLength) return;
+    setState(() {
+      _hasError = false;
+      _currentInput += digit;
+    });
+    if (_currentInput.length == _pinLength) _onComplete();
+  }
+
+  void _onBackspace() {
+    if (_currentInput.isEmpty) return;
+    setState(
+      () =>
+          _currentInput = _currentInput.substring(0, _currentInput.length - 1),
+    );
+  }
+
+  Future<void> _onComplete() async {
+    if (!_isConfirmStep) {
+      setState(() {
+        _firstPin = _currentInput;
+        _currentInput = '';
+        _isConfirmStep = true;
+      });
+      return;
+    }
+
+    if (_currentInput != _firstPin) {
+      setState(() {
+        _hasError = true;
+        _currentInput = '';
+      });
+      return;
+    }
+
+    await AuthStorageService.instance.savePin(_firstPin);
+    await AuthStorageService.instance.extendSession();
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed(BiometricSetupScreen.routeName);
+  }
+
+  void _backToFirstStep() {
+    setState(() {
+      _isConfirmStep = false;
+      _currentInput = '';
+      _hasError = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: _isConfirmStep
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: _backToFirstStep,
+              )
+            : null,
+      ),
+      body: AppBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                Text(
+                  _isConfirmStep ? 'Konfirmasi PIN kamu' : 'Buat PIN baru',
+                  style: theme.textTheme.displaySmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isConfirmStep
+                      ? 'Masukkan ulang PIN yang sama'
+                      : 'PIN ini dipakai buat login berikutnya',
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 36),
+                Container(
+                  key: _pinDotsKey,
+                  child: PinDots(
+                    length: _pinLength,
+                    filled: _currentInput.length,
+                    hasError: _hasError,
+                  ),
+                ),
+                if (_hasError) ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'PIN tidak sama, coba lagi',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                ],
+                const Spacer(),
+                NumericKeypad(onKeyTap: _onKeyTap, onBackspace: _onBackspace),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
